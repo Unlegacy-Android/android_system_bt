@@ -30,6 +30,7 @@
 #include "osi/include/reactor.h"
 #include "osi/include/thread.h"
 #include "vendor.h"
+#include "bt_target.h"
 
 #define HCI_HAL_SERIAL_BUFFER_SIZE 1026
 #define HCI_BLE_EVENT 0x3e
@@ -238,7 +239,9 @@ static void event_uart_has_bytes(eager_reader_t *reader, UNUSED_ATTR void *conte
       LOG_ERROR(LOG_TAG, "%s Unknown HCI message type 0x%x (min=0x%x max=0x%x). Aborting...",
                 __func__, type_byte, DATA_TYPE_ACL, DATA_TYPE_EVENT);
       LOG_EVENT_INT(BT_HCI_UNKNOWN_MESSAGE_TYPE_NUM, type_byte);
+#if (!defined(LEGACY_BRCM_HCI) || (LEGACY_BRCM_HCI == FALSE))
       assert(false && "Unknown HCI message type");
+#endif
       return;
     }
 
