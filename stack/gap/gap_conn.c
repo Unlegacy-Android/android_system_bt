@@ -203,6 +203,7 @@ UINT16 GAP_ConnOpen (char *p_serv_name, UINT8 service_id, BOOLEAN is_server,
         }
     }
 
+#if BLE_INCLUDED == TRUE
     if (transport == BT_TRANSPORT_LE)
     {
         p_ccb->psm = L2CA_REGISTER_COC (psm, &gap_cb.conn.reg_info,
@@ -215,6 +216,7 @@ UINT16 GAP_ConnOpen (char *p_serv_name, UINT8 service_id, BOOLEAN is_server,
         }
     }
 
+#endif
     /* Register with Security Manager for the specific security level */
     p_ccb->service_id = service_id;
     if (!BTM_SetSecurityLevel ((UINT8)!is_server, p_serv_name,
@@ -274,6 +276,8 @@ UINT16 GAP_ConnOpen (char *p_serv_name, UINT8 service_id, BOOLEAN is_server,
             }
         }
 
+#if BLE_INCLUDED == TRUE
+
         if (p_rem_bda && (transport == BT_TRANSPORT_LE))
         {
             cid = L2CA_CONNECT_COC_REQ (p_ccb->psm, p_rem_bda, &p_ccb->local_coc_cfg);
@@ -283,6 +287,7 @@ UINT16 GAP_ConnOpen (char *p_serv_name, UINT8 service_id, BOOLEAN is_server,
                 return (p_ccb->gap_handle);
             }
         }
+#endif
 
         gap_release_ccb (p_ccb);
         return (GAP_INVALID_HANDLE);
@@ -1229,8 +1234,10 @@ static void gap_release_ccb (tGAP_CCB *p_ccb)
     if (p_ccb->transport == BT_TRANSPORT_BR_EDR)
         L2CA_DEREGISTER (psm);
 
+#if BLE_INCLUDED == TRUE
     if(p_ccb->transport == BT_TRANSPORT_LE)
         L2CA_DEREGISTER_COC (psm);
+#endif
 }
 
 #if (GAP_CONN_POST_EVT_INCLUDED == TRUE)
