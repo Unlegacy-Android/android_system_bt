@@ -52,6 +52,7 @@
 #include "btu.h"
 #include "bt_common.h"
 #include "bta_gatt_api.h"
+#include "bta_api.h"
 #include "device/include/interop.h"
 #include "include/stack_config.h"
 #include "osi/include/allocator.h"
@@ -234,12 +235,12 @@ static void btif_dm_ble_passkey_req_evt(tBTA_DM_PIN_REQ *p_pin_req);
 static void btif_dm_ble_key_nc_req_evt(tBTA_DM_SP_KEY_NOTIF *p_notif_req) ;
 static void btif_dm_ble_oob_req_evt(tBTA_DM_SP_RMT_OOB *req_oob_type);
 static void btif_dm_ble_sc_oob_req_evt(tBTA_DM_SP_RMT_OOB *req_oob_type);
-#endif
 
 static void bte_scan_filt_param_cfg_evt(UINT8 action_type,
                                            tBTA_DM_BLE_PF_AVBL_SPACE avbl_space,
                                            tBTA_DM_BLE_REF_VALUE ref_value,
                                            tBTA_STATUS status);
+#endif
 
 static char* btif_get_default_local_name();
 
@@ -2241,7 +2242,6 @@ static void bta_energy_info_cb(tBTA_DM_BLE_TX_TIME_MS tx_time, tBTA_DM_BLE_RX_TI
     btif_transfer_context(btif_dm_upstreams_evt, BTA_DM_ENER_INFO_READ,
                           (char*) &btif_cb, sizeof(btif_activity_energy_info_cb_t), NULL);
 }
-#endif
 
 /*******************************************************************************
 **
@@ -2269,6 +2269,7 @@ static void bte_scan_filt_param_cfg_evt(UINT8 action_type,
     }
 }
 
+#endif
 /*****************************************************************************
 **
 **   btif api functions (no context switch)
@@ -2395,6 +2396,7 @@ bt_status_t btif_dm_create_bond_out_of_band(const bt_bdaddr_t *bd_addr, int tran
     bdcpy(oob_cb.bdaddr, bd_addr->address);
     memcpy(&oob_cb.oob_data, oob_data, sizeof(bt_out_of_band_data_t));
 
+#if (defined(BLE_INCLUDED) && (BLE_INCLUDED == TRUE))
     uint8_t empty[] = {0, 0, 0, 0, 0, 0, 0};
     // If LE Bluetooth Device Address is provided, use provided address type
     // value.
@@ -2407,6 +2409,7 @@ bt_status_t btif_dm_create_bond_out_of_band(const bt_bdaddr_t *bd_addr, int tran
             BTM_SecAddBleDevice(bd_addr->address, NULL, BT_DEVICE_TYPE_BLE, address_type);
         }
     }
+#endif
 
     bdstr_t bdstr;
     BTIF_TRACE_EVENT("%s: bd_addr=%s, transport=%d", __FUNCTION__, bdaddr_to_string(bd_addr, bdstr, sizeof(bdstr)), transport);
@@ -2710,8 +2713,10 @@ bt_status_t btif_dm_get_remote_services_by_transport(bt_bdaddr_t *remote_addr, c
     mask_ext.p_uuid = NULL;
     mask_ext.srvc_mask = BTA_ALL_SERVICE_MASK;
 
+#if ((defined BLE_INCLUDED) && (BLE_INCLUDED == TRUE))
     BTA_DmDiscoverByTransport(remote_addr->address, &mask_ext,
                    bte_dm_search_services_evt, TRUE, transport);
+#endif
 
     return BT_STATUS_SUCCESS;
 }
@@ -2957,6 +2962,7 @@ BOOLEAN btif_dm_get_smp_config(tBTE_APPL_CFG* p_cfg) {
     strncpy(conf, recv, 64);
     conf[63] = 0; // null terminate
 
+#if ((defined BLE_INCLUDED) && (BLE_INCLUDED == TRUE))
     if ((pch = strtok(conf, ",")) != NULL)
         p_cfg->ble_auth_req = (UINT8) strtoul(pch, &endptr, 16);
     else
@@ -2981,6 +2987,7 @@ BOOLEAN btif_dm_get_smp_config(tBTE_APPL_CFG* p_cfg) {
         p_cfg->ble_max_key_size =  (UINT8) strtoul(pch, &endptr, 16);
     else
         return FALSE;
+#endif
 
     return TRUE;
 }
