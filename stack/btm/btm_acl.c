@@ -899,6 +899,7 @@ void BTM_SetDefaultLinkPolicy (UINT16 settings)
 }
 
 
+#if (defined(BLE_INCLUDED) && (BLE_INCLUDED == TRUE))
 void btm_use_preferred_conn_params(BD_ADDR bda) {
     tL2C_LCB *p_lcb = l2cu_find_lcb_by_bd_addr (bda, BT_TRANSPORT_LE);
     tBTM_SEC_DEV_REC    *p_dev_rec = btm_find_or_alloc_dev (bda);
@@ -934,6 +935,7 @@ void btm_use_preferred_conn_params(BD_ADDR bda) {
                                            0, 0);
     }
 }
+#endif
 
 /*******************************************************************************
 **
