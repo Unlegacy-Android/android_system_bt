@@ -38,6 +38,7 @@ bluetooth_CFLAGS += \
   -Wno-gnu-variable-sized-type-not-at-end \
   -Wno-typedef-redefinition \
   -Wno-unused-parameter \
+  -Wno-unused-variable \
   -UNDEBUG \
   -DLOG_NDEBUG=1
 

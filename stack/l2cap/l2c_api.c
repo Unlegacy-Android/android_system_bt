@@ -346,6 +346,9 @@ UINT16 L2CA_ErtmConnectReq (UINT16 psm, BD_ADDR p_bd_addr, tL2CAP_ERTM_INFO *p_e
 **                  and L2CA_DeregisterLECoc()
 **
 *******************************************************************************/
+
+#if (BLE_INCLUDED == TRUE)
+
 UINT16 L2CA_RegisterLECoc(UINT16 psm, tL2CAP_APPL_INFO *p_cb_info)
 {
     L2CAP_TRACE_API("%s called for LE PSM: 0x%04x", __func__, psm);
@@ -415,6 +418,7 @@ UINT16 L2CA_RegisterLECoc(UINT16 psm, tL2CAP_APPL_INFO *p_cb_info)
 ** Returns          void
 **
 *******************************************************************************/
+
 void L2CA_DeregisterLECoc(UINT16 psm)
 {
     L2CAP_TRACE_API("%s called for PSM: 0x%04x", __func__, psm);
@@ -544,6 +548,7 @@ UINT16 L2CA_ConnectLECocReq(UINT16 psm, BD_ADDR p_bd_addr, tL2CAP_LE_CFG_INFO *p
     /* Return the local CID as our handle */
     return p_ccb->local_cid;
 }
+#endif
 
 /*******************************************************************************
 **
