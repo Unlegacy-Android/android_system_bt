@@ -164,11 +164,14 @@ static void l2c_csm_closed(tL2C_CCB* p_ccb, uint16_t event, void* p_data) {
       break;
 
     case L2CEVT_LP_CONNECT_CFM: /* Link came up         */
+#if (BLE_INCLUDED == TRUE)
       if (p_ccb->p_lcb->transport == BT_TRANSPORT_LE) {
         p_ccb->chnl_state = CST_ORIG_W4_SEC_COMP;
         l2ble_sec_access_req(p_ccb->p_lcb->remote_bd_addr, p_ccb->p_rcb->psm,
                              true, &l2c_link_sec_comp2, p_ccb);
-      } else {
+      } else
+#endif
+	  {
         p_ccb->chnl_state = CST_ORIG_W4_SEC_COMP;
         btm_sec_l2cap_access_req(p_ccb->p_lcb->remote_bd_addr,
                                  p_ccb->p_rcb->psm, p_ccb->p_lcb->handle, true,
@@ -189,11 +192,14 @@ static void l2c_csm_closed(tL2C_CCB* p_ccb, uint16_t event, void* p_data) {
       break;
 
     case L2CEVT_L2CA_CONNECT_REQ: /* API connect request  */
+#if (BLE_INCLUDED == TRUE)
       if (p_ccb->p_lcb->transport == BT_TRANSPORT_LE) {
         p_ccb->chnl_state = CST_ORIG_W4_SEC_COMP;
         l2ble_sec_access_req(p_ccb->p_lcb->remote_bd_addr, p_ccb->p_rcb->psm,
                              true, &l2c_link_sec_comp2, p_ccb);
-      } else {
+      } else
+#endif
+	  {
         /* Cancel sniff mode if needed */
         {
           tBTM_PM_PWR_MD settings;
@@ -247,11 +253,14 @@ static void l2c_csm_closed(tL2C_CCB* p_ccb, uint16_t event, void* p_data) {
        * L2CAP */
       alarm_cancel(p_ccb->p_lcb->l2c_lcb_timer);
 
+#if (BLE_INCLUDED == TRUE)
       if (p_ccb->p_lcb->transport == BT_TRANSPORT_LE) {
         p_ccb->chnl_state = CST_TERM_W4_SEC_COMP;
         l2ble_sec_access_req(p_ccb->p_lcb->remote_bd_addr, p_ccb->p_rcb->psm,
                              false, &l2c_link_sec_comp2, p_ccb);
-      } else {
+      } else
+#endif
+	  {
         /* Cancel sniff mode if needed */
         {
           tBTM_PM_PWR_MD settings;
@@ -339,10 +348,13 @@ static void l2c_csm_orig_w4_sec_comp(tL2C_CCB* p_ccb, uint16_t event,
 
     case L2CEVT_SEC_RE_SEND_CMD: /* BTM has enough info to proceed */
     case L2CEVT_LP_CONNECT_CFM:  /* Link came up         */
+#if (BLE_INCLUDED == TRUE)
       if (p_ccb->p_lcb->transport == BT_TRANSPORT_LE) {
         l2ble_sec_access_req(p_ccb->p_lcb->remote_bd_addr, p_ccb->p_rcb->psm,
                              false, &l2c_link_sec_comp2, p_ccb);
-      } else {
+      } else
+#endif
+	  {
         btm_sec_l2cap_access_req(p_ccb->p_lcb->remote_bd_addr,
                                  p_ccb->p_rcb->psm, p_ccb->p_lcb->handle, true,
                                  &l2c_link_sec_comp, p_ccb);
@@ -353,11 +365,14 @@ static void l2c_csm_orig_w4_sec_comp(tL2C_CCB* p_ccb, uint16_t event,
       /* Wait for the info resp in this state before sending connect req (if
        * needed) */
       p_ccb->chnl_state = CST_W4_L2CAP_CONNECT_RSP;
+#if (BLE_INCLUDED == TRUE)
       if (p_ccb->p_lcb->transport == BT_TRANSPORT_LE) {
         alarm_set_on_mloop(p_ccb->l2c_ccb_timer, L2CAP_CHNL_CONNECT_TIMEOUT_MS,
                            l2c_ccb_timer_timeout, p_ccb);
         l2cble_credit_based_conn_req(p_ccb); /* Start Connection     */
-      } else {
+      } else
+#endif
+	  {
         if (!p_ccb->p_lcb->w4_info_rsp) {
           /* Need to have at least one compatible channel to continue */
           if (!l2c_fcr_chk_chan_modes(p_ccb)) {
@@ -474,10 +489,12 @@ static void l2c_csm_term_w4_sec_comp(tL2C_CCB* p_ccb, uint16_t event,
                            L2CAP_DELAY_CHECK_SM4_TIMEOUT_MS,
                            l2c_ccb_timer_timeout, p_ccb);
       } else {
+#if (BLE_INCLUDED == TRUE)
         if (p_ccb->p_lcb->transport == BT_TRANSPORT_LE)
           l2cu_reject_ble_connection(p_ccb->p_lcb, p_ccb->remote_id,
                                      L2CAP_LE_INSUFFICIENT_AUTHENTICATION);
         else
+#endif
           l2cu_send_peer_connect_rsp(p_ccb, L2CAP_CONN_SECURITY_BLOCK, 0);
         l2cu_release_ccb(p_ccb);
       }
@@ -674,6 +691,7 @@ static void l2c_csm_w4_l2ca_connect_rsp(tL2C_CCB* p_ccb, uint16_t event,
 
     case L2CEVT_L2CA_CONNECT_RSP:
       p_ci = (tL2C_CONN_INFO*)p_data;
+#if (BLE_INCLUDED == TRUE)
       if (p_ccb->p_lcb->transport == BT_TRANSPORT_LE) {
         /* Result should be OK or Reject */
         if ((!p_ci) || (p_ci->l2cap_result == L2CAP_CONN_OK)) {
@@ -684,7 +702,9 @@ static void l2c_csm_w4_l2ca_connect_rsp(tL2C_CCB* p_ccb, uint16_t event,
           l2cble_credit_based_conn_res(p_ccb, p_ci->l2cap_result);
           l2cu_release_ccb(p_ccb);
         }
-      } else {
+      } else
+#endif
+	  {
         /* Result should be OK or PENDING */
         if ((!p_ci) || (p_ci->l2cap_result == L2CAP_CONN_OK)) {
           l2cu_send_peer_connect_rsp(p_ccb, L2CAP_CONN_OK, 0);
@@ -704,9 +724,11 @@ static void l2c_csm_w4_l2ca_connect_rsp(tL2C_CCB* p_ccb, uint16_t event,
 
     case L2CEVT_L2CA_CONNECT_RSP_NEG:
       p_ci = (tL2C_CONN_INFO*)p_data;
+#if (BLE_INCLUDED == TRUE)
       if (p_ccb->p_lcb->transport == BT_TRANSPORT_LE)
         l2cble_credit_based_conn_res(p_ccb, p_ci->l2cap_result);
       else
+#endif
         l2cu_send_peer_connect_rsp(p_ccb, p_ci->l2cap_result,
                                    p_ci->l2cap_status);
       l2cu_release_ccb(p_ccb);
@@ -1111,10 +1133,11 @@ static void l2c_csm_open(tL2C_CCB* p_ccb, uint16_t event, void* p_data) {
                            &settings);
         }
       }
-
+#if (BLE_INCLUDED == TRUE)
       if (p_ccb->p_lcb->transport == BT_TRANSPORT_LE)
         l2cble_send_peer_disc_req(p_ccb);
       else
+#endif
         l2cu_send_peer_disc_req(p_ccb);
 
       p_ccb->chnl_state = CST_W4_L2CAP_DISCONNECT_RSP;
@@ -1150,7 +1173,9 @@ static void l2c_csm_open(tL2C_CCB* p_ccb, uint16_t event, void* p_data) {
     case L2CEVT_L2CA_SEND_FLOW_CONTROL_CREDIT:
       L2CAP_TRACE_DEBUG("%s Sending credit", __func__);
       credit = (uint16_t*)p_data;
+#if (BLE_INCLUDED == TRUE)
       l2cble_send_flow_control_credit(p_ccb, *credit);
+#endif
       break;
 
     case L2CEVT_L2CAP_RECV_FLOW_CONTROL_CREDIT:
@@ -1160,7 +1185,9 @@ static void l2c_csm_open(tL2C_CCB* p_ccb, uint16_t event, void* p_data) {
         /* we have received credits more than max coc credits,
          * so disconnecting the Le Coc Channel
          */
+#if (BLE_INCLUDED == TRUE)
         l2cble_send_peer_disc_req(p_ccb);
+#endif
       } else {
         p_ccb->peer_conn_cfg.credits += *credit;
         l2c_link_check_send_pkts(p_ccb->p_lcb, NULL, NULL);
