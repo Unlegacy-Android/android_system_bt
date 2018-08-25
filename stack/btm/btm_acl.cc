@@ -844,6 +844,7 @@ void BTM_SetDefaultLinkPolicy(uint16_t settings) {
   btsnd_hcic_write_def_policy_set(settings);
 }
 
+#if (BLE_INCLUDED == TRUE)
 void btm_use_preferred_conn_params(const RawAddress& bda) {
   tL2C_LCB* p_lcb = l2cu_find_lcb_by_bd_addr(bda, BT_TRANSPORT_LE);
   tBTM_SEC_DEV_REC* p_dev_rec = btm_find_or_alloc_dev(bda);
@@ -881,6 +882,7 @@ void btm_use_preferred_conn_params(const RawAddress& bda) {
         p_dev_rec->conn_params.supervision_tout, 0, 0);
   }
 }
+#endif
 
 /*******************************************************************************
  *
