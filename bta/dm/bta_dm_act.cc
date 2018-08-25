@@ -108,8 +108,10 @@ static void bta_dm_discover_device(const RawAddress& remote_bd_addr);
 static void bta_dm_sys_hw_cback(tBTA_SYS_HW_EVT status);
 static void bta_dm_disable_search_and_disc(void);
 
+#if (SMP_INCLUDED == TRUE)
 static uint8_t bta_dm_ble_smp_cback(tBTM_LE_EVT event, const RawAddress& bda,
                                     tBTM_LE_EVT_DATA* p_data);
+#endif
 static void bta_dm_ble_id_key_cback(uint8_t key_type,
                                     tBTM_BLE_LOCAL_KEYS* p_key);
 #if (BTA_GATT_INCLUDED == TRUE)
@@ -243,18 +245,18 @@ const uint32_t bta_service_id_to_btm_srv_id_lkup_tbl[BTA_MAX_SERVICE_ID] = {
 };
 
 /* bta security callback */
-const tBTM_APPL_INFO bta_security = {&bta_dm_authorize_cback,
-                                     &bta_dm_pin_cback,
-                                     &bta_dm_new_link_key_cback,
-                                     &bta_dm_authentication_complete_cback,
-                                     &bta_dm_bond_cancel_complete_cback,
+const tBTM_APPL_INFO bta_security = {
+    &bta_dm_authorize_cback, &bta_dm_pin_cback, &bta_dm_new_link_key_cback,
+    &bta_dm_authentication_complete_cback, &bta_dm_bond_cancel_complete_cback,
 #if (BTM_LOCAL_IO_CAPS != BTM_IO_CAP_NONE)
-                                     &bta_dm_sp_cback,
+    &bta_dm_sp_cback
 #else
-                                     NULL,
+    NULL
 #endif
-                                     &bta_dm_ble_smp_cback,
-                                     &bta_dm_ble_id_key_cback};
+#if (SMP_INCLUDED == TRUE)
+    ,&bta_dm_ble_smp_cback
+#endif
+    ,&bta_dm_ble_id_key_cback};
 
 #define MAX_DISC_RAW_DATA_BUF (4096)
 uint8_t g_disc_raw_data_buf[MAX_DISC_RAW_DATA_BUF];
@@ -4066,6 +4068,7 @@ static void bta_dm_observe_cmpl_cb(void* p_result) {
   }
 }
 
+#if (SMP_INCLUDED == TRUE)
 /*******************************************************************************
  *
  * Function         bta_dm_ble_smp_cback
@@ -4181,6 +4184,7 @@ static uint8_t bta_dm_ble_smp_cback(tBTM_LE_EVT event, const RawAddress& bda,
   }
   return status;
 }
+#endif /* SMP_INCLUDED == TRUE */
 
 /*******************************************************************************
  *

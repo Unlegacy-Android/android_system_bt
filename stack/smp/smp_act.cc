@@ -26,6 +26,7 @@
 #include "stack/smp/smp_int.h"
 #include "utils/include/bt_utils.h"
 
+#if (SMP_INCLUDED == TRUE)
 #define SMP_KEY_DIST_TYPE_MAX 4
 
 const tSMP_ACT smp_distribute_act[] = {smp_generate_ltk, smp_send_id_info,
@@ -2010,3 +2011,4 @@ void smp_br_pairing_complete(tSMP_CB* p_cb, tSMP_INT_DATA* p_data) {
     smp_proc_pairing_cmpl(p_cb);
   }
 }
+#endif

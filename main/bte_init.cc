@@ -60,7 +60,9 @@
 #endif
 
 #include "gatt_api.h"
+#if (SMP_INCLUDED == TRUE)
 #include "smp_api.h"
+#endif
 
 /*****************************************************************************
  *                          F U N C T I O N S                                *

@@ -1384,8 +1384,12 @@ typedef uint8_t tBTM_SP_EVT;
 #define BTM_IO_CAP_IO 1     /* DisplayYesNo */
 #define BTM_IO_CAP_IN 2     /* KeyboardOnly */
 #define BTM_IO_CAP_NONE 3   /* NoInputNoOutput */
+#if (SMP_INCLUDED == TRUE)
 #define BTM_IO_CAP_KBDISP 4 /* Keyboard display */
 #define BTM_IO_CAP_MAX 5
+#else
+#define BTM_IO_CAP_MAX      4
+#endif
 #define BTM_IO_CAP_UNKNOWN 0xFF /* Unknown value */
 
 typedef uint8_t tBTM_IO_CAP;
@@ -1634,6 +1638,7 @@ typedef struct {
   tBTM_LE_KEY_TYPE resp_keys; /* keys to be distributed, bit mask */
 } tBTM_LE_IO_REQ;
 
+#if (SMP_INCLUDED == TRUE)
 /* data type for tBTM_LE_COMPLT */
 typedef struct {
   uint8_t reason;
@@ -1641,6 +1646,8 @@ typedef struct {
   bool is_pair_cancel;
   bool smp_over_br;
 } tBTM_LE_COMPLT;
+#endif
+
 
 /* BLE encryption keys */
 typedef struct {
@@ -1701,8 +1708,10 @@ typedef union {
                          /* no callback data for
                           * BTM_LE_KEY_REQ_EVT
                           * and BTM_LE_OOB_REQ_EVT  */
+#if (SMP_INCLUDED == TRUE)
   tBTM_LE_COMPLT complt; /* BTM_LE_COMPLT_EVT      */
   tSMP_OOB_DATA_TYPE req_oob_type;
+#endif
   tBTM_LE_KEY key;
 } tBTM_LE_EVT_DATA;
 
@@ -1744,7 +1753,9 @@ typedef struct {
   tBTM_AUTH_COMPLETE_CALLBACK* p_auth_complete_callback;
   tBTM_BOND_CANCEL_CMPL_CALLBACK* p_bond_cancel_cmpl_callback;
   tBTM_SP_CALLBACK* p_sp_callback;
+#if (SMP_INCLUDED == TRUE)
   tBTM_LE_CALLBACK* p_le_callback;
+#endif
   tBTM_LE_KEY_CALLBACK* p_le_key_callback;
 } tBTM_APPL_INFO;
 

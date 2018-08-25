@@ -34,7 +34,10 @@
 #include "osi/include/log.h"
 #include "osi/include/thread.h"
 #include "sdpint.h"
+
+#if (SMP_INCLUDED == TRUE)
 #include "smp_int.h"
+#endif
 
 // RT priority for audio-related tasks
 #define BTU_TASK_RT_PRIORITY 1
@@ -69,9 +72,9 @@ void btu_init_core(void) {
   sdp_init();
 
   gatt_init();
-
+#if (SMP_INCLUDED == TRUE)
   SMP_Init();
-
+#endif
   btm_ble_init();
 }
 

@@ -220,12 +220,14 @@ extern void SMP_KeypressNotification(const RawAddress& bd_addr, uint8_t value);
 extern bool SMP_CreateLocalSecureConnectionsOobData(
     tBLE_BD_ADDR* addr_to_send_to);
 
+#if (SMP_INCLUDED == TRUE)
 // Called when LTK request is received from controller.
 extern bool smp_proc_ltk_request(const RawAddress& bda);
 
 // Called when link is encrypted and notified to slave device.
 // Proceed to send LTK, DIV and ER to master if bonding the devices.
 extern void smp_link_encrypted(const RawAddress& bda, uint8_t encr_enable);
+#endif /* SMP_INCLUDED == TRUE */
 
 //
 // The AES-CMAC Generation Function with tlen implemented.

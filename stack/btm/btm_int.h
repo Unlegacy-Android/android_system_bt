@@ -38,8 +38,11 @@
 #include "device/include/esco_parameters.h"
 
 #include "btm_ble_int.h"
-#include "btm_int_types.h"
+#if (SMP_INCLUDED == TRUE)
 #include "smp_api.h"
+#endif
+
+#include "btm_int_types.h"
 
 extern tBTM_CB btm_cb;
 

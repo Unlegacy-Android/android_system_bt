@@ -228,6 +228,7 @@ bool BTM_SecRegister(tBTM_APPL_INFO* p_cb_info) {
 
   BTM_TRACE_EVENT("%s application registered", __func__);
 
+#if (SMP_INCLUDED == TRUE)
   LOG_INFO(LOG_TAG, "%s p_cb_info->p_le_callback == 0x%p", __func__,
            p_cb_info->p_le_callback);
   if (p_cb_info->p_le_callback) {
@@ -240,10 +241,13 @@ bool BTM_SecRegister(tBTM_APPL_INFO* p_cb_info) {
   } else {
     LOG_WARN(LOG_TAG, "%s p_cb_info->p_le_callback == NULL", __func__);
   }
+#endif /* (SMP_INCLUDED == TRUE) */
 
   btm_cb.api = *p_cb_info;
+#if (SMP_INCLUDED == TRUE)
   LOG_INFO(LOG_TAG, "%s btm_cb.api.p_le_callback = 0x%p ", __func__,
            btm_cb.api.p_le_callback);
+#endif
   BTM_TRACE_EVENT("%s application registered", __func__);
   return (true);
 }
@@ -1000,6 +1004,7 @@ tBTM_STATUS btm_sec_bond_by_transport(const RawAddress& bd_addr,
   if (trusted_mask)
     BTM_SEC_COPY_TRUSTED_DEVICE(trusted_mask, p_dev_rec->trusted_mask);
 
+#if (SMP_INCLUDED == TRUE)
   if (transport == BT_TRANSPORT_LE) {
     btm_ble_init_pseudo_addr(p_dev_rec, bd_addr);
     p_dev_rec->sec_flags &= ~BTM_SEC_LE_MASK;
@@ -1014,6 +1019,7 @@ tBTM_STATUS btm_sec_bond_by_transport(const RawAddress& bd_addr,
     btm_cb.pairing_flags = 0;
     return (BTM_NO_RESOURCES);
   }
+#endif
 
   p_dev_rec->sec_flags &=
       ~(BTM_SEC_LINK_KEY_KNOWN | BTM_SEC_AUTHENTICATED | BTM_SEC_ENCRYPTED |
@@ -1118,6 +1124,7 @@ tBTM_STATUS btm_sec_bond_by_transport(const RawAddress& bd_addr,
 tBTM_STATUS BTM_SecBondByTransport(const RawAddress& bd_addr,
                                    tBT_TRANSPORT transport, uint8_t pin_len,
                                    uint8_t* p_pin, uint32_t trusted_mask[]) {
+#if (SMP_INCLUDED == TRUE)
   tBT_DEVICE_TYPE dev_type;
   tBLE_ADDR_TYPE addr_type;
 
@@ -1128,6 +1135,7 @@ tBTM_STATUS BTM_SecBondByTransport(const RawAddress& bd_addr,
        (dev_type & BT_DEVICE_TYPE_BREDR) == 0)) {
     return BTM_ILLEGAL_ACTION;
   }
+#endif
   return btm_sec_bond_by_transport(bd_addr, transport, pin_len, p_pin,
                                    trusted_mask);
 }
@@ -1177,6 +1185,7 @@ tBTM_STATUS BTM_SecBondCancel(const RawAddress& bd_addr) {
     return BTM_UNKNOWN_ADDR;
   }
 
+#if (SMP_INCLUDED == TRUE)
   if (btm_cb.pairing_flags & BTM_PAIR_FLAGS_LE_ACTIVE) {
     if (p_dev_rec->sec_state == BTM_SEC_STATE_AUTHENTICATING) {
       BTM_TRACE_DEBUG("Cancel LE pairing");
@@ -1186,6 +1195,7 @@ tBTM_STATUS BTM_SecBondCancel(const RawAddress& bd_addr) {
     }
     return BTM_WRONG_MODE;
   }
+#endif
 
   BTM_TRACE_DEBUG("hci_handle:0x%x sec_state:%d", p_dev_rec->hci_handle,
                   p_dev_rec->sec_state);
@@ -1364,6 +1374,7 @@ tBTM_STATUS BTM_SetEncryption(const RawAddress& bd_addr,
       p_dev_rec->hci_handle, p_dev_rec->sec_state, p_dev_rec->sec_flags,
       p_dev_rec->security_required);
 
+#if (SMP_INCLUDED == TRUE)
   if (transport == BT_TRANSPORT_LE) {
     tACL_CONN* p = btm_bda_to_acl(bd_addr, transport);
     if (p) {
@@ -1373,7 +1384,9 @@ tBTM_STATUS BTM_SetEncryption(const RawAddress& bd_addr,
       BTM_TRACE_WARNING("%s: cannot call btm_ble_set_encryption, p is NULL",
                         __func__);
     }
-  } else {
+  } else 
+#endif
+  {
     rc = btm_sec_execute_procedure(p_dev_rec);
   }
 
@@ -1407,6 +1420,7 @@ static tBTM_STATUS btm_sec_send_hci_disconnect(tBTM_SEC_DEV_REC* p_dev_rec,
       p_dev_rec->sec_state = BTM_SEC_STATE_DISCONNECTING_BOTH;
       break;
 
+#if (SMP_INCLUDED == TRUE)
     case BTM_SEC_STATE_DISCONNECTING_BLE:
       if (conn_handle == p_dev_rec->ble_hci_handle) return status;
 
@@ -1415,6 +1429,7 @@ static tBTM_STATUS btm_sec_send_hci_disconnect(tBTM_SEC_DEV_REC* p_dev_rec,
 
     case BTM_SEC_STATE_DISCONNECTING_BOTH:
       return status;
+#endif
 
     default:
       p_dev_rec->sec_state = (conn_handle == p_dev_rec->hci_handle)
@@ -4070,8 +4085,10 @@ void btm_sec_auth_complete(uint16_t handle, uint8_t status) {
 void btm_sec_encrypt_change(uint16_t handle, uint8_t status,
                             uint8_t encr_enable) {
   tBTM_SEC_DEV_REC* p_dev_rec = btm_find_dev_by_handle(handle);
+#if (SMP_INCLUDED == TRUE)
   tACL_CONN* p_acl = NULL;
   uint8_t acl_idx = btm_handle_to_acl_index(handle);
+#endif
   BTM_TRACE_EVENT(
       "Security Manager: encrypt_change status:%d State:%d, encr_enable = %d",
       status, (p_dev_rec) ? p_dev_rec->sec_state : 0, encr_enable);
@@ -4115,6 +4132,7 @@ void btm_sec_encrypt_change(uint16_t handle, uint8_t status,
   BTM_TRACE_DEBUG("after update p_dev_rec->sec_flags=0x%x",
                   p_dev_rec->sec_flags);
 
+#if (SMP_INCLUDED == TRUE)
   if (acl_idx != MAX_L2CAP_LINKS) p_acl = &btm_cb.acl_db[acl_idx];
 
   if (p_acl != NULL)
@@ -4182,6 +4200,9 @@ void btm_sec_encrypt_change(uint16_t handle, uint8_t status,
       }
     }
   }
+#else
+    btm_sec_check_pending_enc_req (p_dev_rec, BT_TRANSPORT_BR_EDR, encr_enable);
+#endif /* SMP_INCLUDED == TRUE */
 
   /* If this encryption was started by peer do not need to do anything */
   if (p_dev_rec->sec_state != BTM_SEC_STATE_ENCRYPTING) {
@@ -4638,6 +4659,7 @@ void btm_sec_disconnected(uint16_t handle, uint8_t reason) {
     }
   }
 
+#if (SMP_INCLUDED == TRUE)
   btm_ble_update_mode_operation(HCI_ROLE_UNKNOWN, &p_dev_rec->bd_addr,
                                 HCI_SUCCESS);
   /* see sec_flags processing in btm_acl_removed */
@@ -4646,7 +4668,9 @@ void btm_sec_disconnected(uint16_t handle, uint8_t reason) {
     p_dev_rec->ble_hci_handle = BTM_SEC_INVALID_HANDLE;
     p_dev_rec->sec_flags &= ~(BTM_SEC_LE_AUTHENTICATED | BTM_SEC_LE_ENCRYPTED);
     p_dev_rec->enc_key_size = 0;
-  } else {
+  } else
+#endif
+  {
     p_dev_rec->hci_handle = BTM_SEC_INVALID_HANDLE;
     p_dev_rec->sec_flags &=
         ~(BTM_SEC_AUTHORIZED | BTM_SEC_AUTHENTICATED | BTM_SEC_ENCRYPTED |
@@ -4660,12 +4684,14 @@ void btm_sec_disconnected(uint16_t handle, uint8_t reason) {
   BTM_TRACE_EVENT("%s after update sec_flags=0x%x", __func__,
                   p_dev_rec->sec_flags);
 
+#if (SMP_INCLUDED == TRUE)
   if (p_dev_rec->sec_state == BTM_SEC_STATE_DISCONNECTING_BOTH) {
     p_dev_rec->sec_state = (transport == BT_TRANSPORT_LE)
                                ? BTM_SEC_STATE_DISCONNECTING
                                : BTM_SEC_STATE_DISCONNECTING_BLE;
     return;
   }
+#endif
   p_dev_rec->sec_state = BTM_SEC_STATE_IDLE;
   p_dev_rec->security_required = BTM_SEC_NONE;
 
@@ -5975,11 +6001,13 @@ static uint16_t btm_sec_set_serv_level4_flags(uint16_t cur_security,
  ******************************************************************************/
 void btm_sec_clear_ble_keys(tBTM_SEC_DEV_REC* p_dev_rec) {
   BTM_TRACE_DEBUG("%s() Clearing BLE Keys", __func__);
+#if (SMP_INCLUDED == TRUE)
   p_dev_rec->ble.key_type = BTM_LE_KEY_NONE;
   memset(&p_dev_rec->ble.keys, 0, sizeof(tBTM_SEC_BLE_KEYS));
 
 #if (BLE_PRIVACY_SPT == TRUE)
   btm_ble_resolving_list_remove_dev(p_dev_rec);
+#endif
 #endif
 }
 
@@ -5996,8 +6024,12 @@ bool btm_sec_is_a_bonded_dev(const RawAddress& bda) {
   tBTM_SEC_DEV_REC* p_dev_rec = btm_find_dev(bda);
   bool is_bonded = false;
 
-  if (p_dev_rec && ((p_dev_rec->ble.key_type &&
-                     (p_dev_rec->sec_flags & BTM_SEC_LE_LINK_KEY_KNOWN)) ||
+  if (p_dev_rec && 
+#if (SMP_INCLUDED == TRUE)
+                    ((p_dev_rec->ble.key_type && (p_dev_rec->sec_flags & BTM_SEC_LE_LINK_KEY_KNOWN)) ||
+#else
+                    (
+#endif
                     (p_dev_rec->sec_flags & BTM_SEC_LINK_KEY_KNOWN))) {
     is_bonded = true;
   }

@@ -180,6 +180,7 @@ class BleAdvertisingManagerImpl
 
   void OnRpaGenerationComplete(base::Callback<void(RawAddress)> cb,
                                uint8_t rand[8]) {
+#if (SMP_INCLUDED == TRUE)
     VLOG(1) << __func__;
 
     RawAddress bda;
@@ -204,6 +205,7 @@ class BleAdvertisingManagerImpl
     bda.address[3] = output.param_buf[2];
 
     cb.Run(bda);
+#endif
   }
 
   void GenerateRpa(base::Callback<void(RawAddress)> cb) {
