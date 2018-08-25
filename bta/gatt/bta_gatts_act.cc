@@ -25,6 +25,7 @@
 
 #include "bt_target.h"
 
+#if (BTA_GATT_INCLUDED == TRUE)
 #include <base/logging.h>
 #include <string.h>
 #include "bt_common.h"
@@ -679,3 +680,4 @@ static void bta_gatts_cong_cback(uint16_t conn_id, bool congested) {
     }
   }
 }
+#endif /* BTA_GATT_INCLUDED */

@@ -271,9 +271,10 @@ void BTA_DmDiscoverUUID(const RawAddress& bd_addr, tSDP_UUID* uuid,
   p_msg->p_cback = p_cback;
   p_msg->sdp_search = sdp_search;
 
+#if (BTA_GATT_INCLUDED == TRUE)
   p_msg->num_uuid = 0;
   p_msg->p_uuid = NULL;
-
+#endif
   memcpy(&p_msg->uuid, uuid, sizeof(tSDP_UUID));
 
   bta_sys_sendmsg(p_msg);
@@ -810,6 +811,7 @@ void BTA_DmBleStartAutoConn() {
  * Returns          void
  *
  ******************************************************************************/
+#if (BTA_GATT_INCLUDED == TRUE)
 static void bta_dm_discover_send_msg(const RawAddress& bd_addr,
                                      tBTA_SERVICE_MASK_EXT* p_services,
                                      tBTA_DM_SEARCH_CBACK* p_cback,
@@ -827,6 +829,7 @@ static void bta_dm_discover_send_msg(const RawAddress& bd_addr,
   p_msg->transport = transport;
 
   if (p_services != NULL) {
+#if (BTA_GATT_INCLUDED == TRUE)
     p_msg->services = p_services->srvc_mask;
     p_msg->num_uuid = p_services->num_uuid;
     if (p_services->num_uuid != 0) {
@@ -834,10 +837,12 @@ static void bta_dm_discover_send_msg(const RawAddress& bd_addr,
       memcpy(p_msg->p_uuid, p_services->p_uuid,
              sizeof(tBT_UUID) * p_services->num_uuid);
     }
+#endif
   }
 
   bta_sys_sendmsg(p_msg);
 }
+#endif
 
 /*******************************************************************************
  *
@@ -859,7 +864,9 @@ void BTA_DmDiscoverByTransport(const RawAddress& bd_addr,
                                tBTA_SERVICE_MASK_EXT* p_services,
                                tBTA_DM_SEARCH_CBACK* p_cback, bool sdp_search,
                                tBTA_TRANSPORT transport) {
+#if (BTA_GATT_INCLUDED == TRUE)
   bta_dm_discover_send_msg(bd_addr, p_services, p_cback, sdp_search, transport);
+#endif
 }
 
 /*******************************************************************************
@@ -880,8 +887,10 @@ void BTA_DmDiscoverByTransport(const RawAddress& bd_addr,
 void BTA_DmDiscoverExt(const RawAddress& bd_addr,
                        tBTA_SERVICE_MASK_EXT* p_services,
                        tBTA_DM_SEARCH_CBACK* p_cback, bool sdp_search) {
+#if (BTA_GATT_INCLUDED == TRUE)
   bta_dm_discover_send_msg(bd_addr, p_services, p_cback, sdp_search,
                            BTA_TRANSPORT_UNKNOWN);
+#endif
 }
 
 /*******************************************************************************
@@ -904,6 +913,7 @@ void BTA_DmDiscoverExt(const RawAddress& bd_addr,
  * Returns          void
  *
  ******************************************************************************/
+#if (BTA_GATT_INCLUDED == TRUE)
 void BTA_DmSearchExt(tBTA_DM_INQ* p_dm_inq, tBTA_SERVICE_MASK_EXT* p_services,
                      tBTA_DM_SEARCH_CBACK* p_cback) {
   const size_t len = p_services ? (sizeof(tBTA_DM_API_SEARCH) +
@@ -931,7 +941,11 @@ void BTA_DmSearchExt(tBTA_DM_INQ* p_dm_inq, tBTA_SERVICE_MASK_EXT* p_services,
 
   bta_sys_sendmsg(p_msg);
 }
-
+#else
+void BTA_DmSearchExt(UNUSED_ATTR tBTA_DM_INQ* p_dm_inq,
+                     UNUSED_ATTR tBTA_SERVICE_MASK_EXT* p_services,
+                     UNUSED_ATTR tBTA_DM_SEARCH_CBACK* p_cback) {}
+#endif
 /*******************************************************************************
  *
  * Function         BTA_DmBleUpdateConnectionParam

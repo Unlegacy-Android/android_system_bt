@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "bt_target.h"
 
+#if (BTA_GATT_INCLUDED == TRUE)
 #include <base/strings/stringprintf.h>
 #include <stdio.h>
 #include <string.h>
@@ -1341,3 +1342,4 @@ bool GATT_GetConnIdIfConnected(tGATT_IF gatt_if, const RawAddress& bd_addr,
   VLOG(1) << __func__ << " status= " << +status;
   return status;
 }
+#endif
