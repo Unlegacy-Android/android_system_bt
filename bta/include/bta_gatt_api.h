@@ -39,6 +39,11 @@ using std::vector;
 #define BTA_GATT_INCLUDED false
 #endif
 
+#if (BLE_INCLUDED == FALSE && BTA_GATT_INCLUDED == TRUE)
+#undef BTA_GATT_INCLUDED
+#define BTA_GATT_INCLUDED false
+#endif
+
 #ifndef BTA_GATT_DEBUG
 #define BTA_GATT_DEBUG false
 #endif

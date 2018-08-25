@@ -644,10 +644,12 @@ typedef struct {
   int8_t rssi; /* Set to BTM_INQ_RES_IGNORE_RSSI if  not valid */
   uint32_t eir_uuid[BTM_EIR_SERVICE_ARRAY_SIZE];
   bool eir_complete_list;
+#if (BLE_INCLUDED == TRUE)
   tBT_DEVICE_TYPE device_type;
   uint8_t inq_result_type;
   uint8_t ble_addr_type;
   uint16_t ble_evt_type;
+#endif
   uint8_t ble_primary_phy;
   uint8_t ble_secondary_phy;
   uint8_t ble_advertising_sid;
@@ -669,10 +671,12 @@ typedef struct {
                                remote name request is
                                required to be done. Having the flag here avoid
                                duplicate store of inquiry results */
+#if (BLE_INCLUDED == TRUE)
   uint16_t remote_name_len;
   tBTM_BD_NAME remote_name;
   uint8_t remote_name_state;
   uint8_t remote_name_type;
+#endif
 
 } tBTM_INQ_INFO;
 
@@ -856,16 +860,20 @@ typedef struct {
   BD_NAME_PTR p_bdn;       /* The device name */
   uint8_t* p_features;     /* pointer to the remote device's features page[0]
                               (supported features page) */
+#if (BLE_INCLUDED == TRUE)
   uint16_t handle;         /* connection handle */
   tBT_TRANSPORT transport; /* link is LE or not */
+#endif
 } tBTM_BL_CONN_DATA;
 
 /* the data type associated with BTM_BL_DISCN_EVT */
 typedef struct {
   tBTM_BL_EVENT event;     /* The event reported. */
   const RawAddress* p_bda; /* The address of the disconnected device */
+#if (BLE_INCLUDED == TRUE)
   uint16_t handle;         /* disconnected connection handle */
   tBT_TRANSPORT transport; /* link is LE link or not */
+#endif
 } tBTM_BL_DISCN_DATA;
 
 /* Busy-Level shall have the inquiry_paging mask set when
@@ -913,10 +921,16 @@ typedef void(tBTM_BL_CHANGE_CB)(tBTM_BL_EVENT_DATA* p_data);
  * changes. First param is BD address, second is if added or removed.
  * Registered through BTM_AclRegisterForChanges call.
 */
+#if (BLE_INCLUDED == TRUE)
 typedef void(tBTM_ACL_DB_CHANGE_CB)(const RawAddress& p_bda, DEV_CLASS p_dc,
                                     BD_NAME p_bdn, uint8_t* features,
                                     bool is_new, uint16_t handle,
                                     tBT_TRANSPORT transport);
+#else
+typedef void(tBTM_ACL_DB_CHANGE_CB)(const RawAddress& p_bda, DEV_CLASS p_dc,
+                                    BD_NAME p_bdn, uint8_t *features,
+                                    bool is_new);
+#endif
 /*****************************************************************************
  *  SCO CHANNEL MANAGEMENT
  ****************************************************************************/
@@ -1384,7 +1398,7 @@ typedef uint8_t tBTM_SP_EVT;
 #define BTM_IO_CAP_IO 1     /* DisplayYesNo */
 #define BTM_IO_CAP_IN 2     /* KeyboardOnly */
 #define BTM_IO_CAP_NONE 3   /* NoInputNoOutput */
-#if (SMP_INCLUDED == TRUE)
+#if (BLE_INCLUDED == TRUE && SMP_INCLUDED == TRUE)
 #define BTM_IO_CAP_KBDISP 4 /* Keyboard display */
 #define BTM_IO_CAP_MAX 5
 #else
@@ -1638,7 +1652,7 @@ typedef struct {
   tBTM_LE_KEY_TYPE resp_keys; /* keys to be distributed, bit mask */
 } tBTM_LE_IO_REQ;
 
-#if (SMP_INCLUDED == TRUE)
+#if (BLE_INCLUDED == TRUE && SMP_INCLUDED == TRUE)
 /* data type for tBTM_LE_COMPLT */
 typedef struct {
   uint8_t reason;
@@ -1708,7 +1722,7 @@ typedef union {
                          /* no callback data for
                           * BTM_LE_KEY_REQ_EVT
                           * and BTM_LE_OOB_REQ_EVT  */
-#if (SMP_INCLUDED == TRUE)
+#if (BLE_INCLUDED == TRUE && SMP_INCLUDED == TRUE)
   tBTM_LE_COMPLT complt; /* BTM_LE_COMPLT_EVT      */
   tSMP_OOB_DATA_TYPE req_oob_type;
 #endif
@@ -1753,10 +1767,12 @@ typedef struct {
   tBTM_AUTH_COMPLETE_CALLBACK* p_auth_complete_callback;
   tBTM_BOND_CANCEL_CMPL_CALLBACK* p_bond_cancel_cmpl_callback;
   tBTM_SP_CALLBACK* p_sp_callback;
+#if (BLE_INCLUDED == TRUE)
 #if (SMP_INCLUDED == TRUE)
   tBTM_LE_CALLBACK* p_le_callback;
 #endif
   tBTM_LE_KEY_CALLBACK* p_le_key_callback;
+#endif
 } tBTM_APPL_INFO;
 
 /* Callback function for when a link supervision timeout event occurs.

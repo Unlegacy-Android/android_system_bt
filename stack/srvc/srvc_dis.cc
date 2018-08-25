@@ -28,6 +28,7 @@
 #include "srvc_dis_int.h"
 #include "srvc_eng_int.h"
 
+#if (BLE_INCLUDED == TRUE)
 using base::StringPrintf;
 #define DIS_MAX_NUM_INC_SVR 0
 #define DIS_MAX_CHAR_NUM 9
@@ -474,3 +475,4 @@ bool DIS_ReadDISInfo(const RawAddress& peer_bda, tDIS_READ_CBACK* p_cback,
 
   return dis_gatt_c_read_dis_req(conn_id);
 }
+#endif  /* BLE_INCLUDED */

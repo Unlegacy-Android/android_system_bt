@@ -16,6 +16,7 @@
  *
  ******************************************************************************/
 
+#if (BLE_INCLUDED == TRUE)
 #include <base/logging.h>
 #include <base/strings/stringprintf.h>
 #include <string.h>
@@ -579,3 +580,4 @@ bool GAP_BleCancelReadPeerDevName(const RawAddress& peer_bda) {
 
   return (true);
 }
+#endif  /* BLE_INCLUDED */

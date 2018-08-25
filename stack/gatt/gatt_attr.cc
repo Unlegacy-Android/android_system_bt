@@ -31,6 +31,7 @@
 #include "gatt_int.h"
 #include "osi/include/osi.h"
 
+#if (BLE_INCLUDED == TRUE)
 using base::StringPrintf;
 
 #define GATTP_MAX_NUM_INC_SVR 0
@@ -461,3 +462,5 @@ void GATT_ConfigServiceChangeCCC(const RawAddress& remote_bda, bool enable,
   p_clcb->ccc_stage++;
   gatt_cl_start_config_ccc(p_clcb);
 }
+
+#endif  /* BLE_INCLUDED */

@@ -59,9 +59,11 @@
 #include "mca_api.h"
 #endif
 
+#if (BLE_INCLUDED == TRUE)
 #include "gatt_api.h"
 #if (SMP_INCLUDED == TRUE)
 #include "smp_api.h"
+#endif
 #endif
 
 /*****************************************************************************
