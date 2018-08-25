@@ -882,6 +882,8 @@ void BTA_DmDiscoverByTransport(const RawAddress& bd_addr,
                                tBTA_TRANSPORT transport) {
 #if (BLE_INCLUDED == TRUE && BTA_GATT_INCLUDED == TRUE)
   bta_dm_discover_send_msg(bd_addr, p_services, p_cback, sdp_search, transport);
+#else
+  return;
 #endif
 }
 

@@ -157,10 +157,12 @@ static void bta_dm_ctrl_features_rd_cmpl_cback(tBTM_STATUS result);
 
 static void bta_dm_reset_sec_dev_pending(const RawAddress& remote_bd_addr);
 static void bta_dm_remove_sec_dev_entry(const RawAddress& remote_bd_addr);
+#if (BTA_GATT_INCLUDED == TRUE)
 static void bta_dm_observe_results_cb(tBTM_INQ_RESULTS* p_inq, uint8_t* p_eir,
                                       uint16_t eir_len);
 static void bta_dm_observe_cmpl_cb(void* p_result);
 static void bta_dm_delay_role_switch_cback(void* data);
+#endif
 static void bta_dm_disable_timer_cback(void* data);
 
 const uint16_t bta_service_id_to_uuid_lkup_tbl[BTA_MAX_SERVICE_ID] = {
@@ -396,7 +398,9 @@ static void bta_dm_sys_hw_cback(tBTA_SYS_HW_EVT status) {
 
     /* hw is ready, go on with BTA DM initialization */
     alarm_free(bta_dm_search_cb.search_timer);
+#if (BTA_GATT_INCLUDED == TRUE)
     alarm_free(bta_dm_search_cb.gatt_close_timer);
+#endif
     memset(&bta_dm_search_cb, 0, sizeof(bta_dm_search_cb));
 
     /* unregister from SYS */
@@ -421,15 +425,19 @@ static void bta_dm_sys_hw_cback(tBTA_SYS_HW_EVT status) {
 
     /* hw is ready, go on with BTA DM initialization */
     alarm_free(bta_dm_search_cb.search_timer);
+#if (BTA_GATT_INCLUDED == TRUE)
     alarm_free(bta_dm_search_cb.gatt_close_timer);
+#endif
     memset(&bta_dm_search_cb, 0, sizeof(bta_dm_search_cb));
     /*
      * TODO: Should alarm_free() the bta_dm_search_cb timers during
      * graceful shutdown.
      */
     bta_dm_search_cb.search_timer = alarm_new("bta_dm_search.search_timer");
+#if (BTA_GATT_INCLUDED == TRUE)
     bta_dm_search_cb.gatt_close_timer =
         alarm_new("bta_dm_search.gatt_close_timer");
+#endif
 
     memset(&bta_dm_conn_srvcs, 0, sizeof(bta_dm_conn_srvcs));
     memset(&bta_dm_di_cb, 0, sizeof(tBTA_DM_DI_CB));
@@ -732,7 +740,9 @@ void bta_dm_remove_device(tBTA_DM_MSG* p_data) {
 
   /* If ACL exists for the device in the remove_bond message*/
   bool continue_delete_dev = false;
+#if (BTA_GATT_INCLUDED == TRUE)
   uint8_t other_transport = BT_TRANSPORT_INVALID;
+#endif
 
   if (BTM_IsAclConnectionUp(p_dev->bd_addr, BT_TRANSPORT_LE) ||
       BTM_IsAclConnectionUp(p_dev->bd_addr, BT_TRANSPORT_BR_EDR)) {
