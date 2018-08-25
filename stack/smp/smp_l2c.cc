@@ -24,6 +24,8 @@
 
 #include "bt_target.h"
 
+#if (SMP_INCLUDED == TRUE)
+
 #include <string.h>
 #include "btm_ble_api.h"
 #include "l2c_api.h"
@@ -309,3 +311,4 @@ static void smp_br_data_received(uint16_t channel, const RawAddress& bd_addr,
 
   osi_free(p_buf);
 }
+#endif /* SMP_INCLUDED == TRUE */
