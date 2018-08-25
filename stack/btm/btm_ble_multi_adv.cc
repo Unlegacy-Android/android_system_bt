@@ -29,6 +29,7 @@
 #include "device/include/controller.h"
 #include "osi/include/alarm.h"
 
+#if (BLE_INCLUDED == TRUE)
 #include "ble_advertiser.h"
 #include "ble_advertiser_hci_interface.h"
 #include "btm_int_types.h"
@@ -1047,3 +1048,4 @@ void testRecomputeTimeout3() {
   timeout_triggered = false;
   CHECK(test1.enable_status == false);
 }
+#endif

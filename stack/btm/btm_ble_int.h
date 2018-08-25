@@ -33,7 +33,7 @@
 #include "btm_int.h"
 #include "btm_int_types.h"
 #include "hcidefs.h"
-#if (SMP_INCLUDED == TRUE)
+#if (BLE_INCLUDED == TRUE && SMP_INCLUDED == TRUE)
 #include "smp_api.h"
 #endif
 

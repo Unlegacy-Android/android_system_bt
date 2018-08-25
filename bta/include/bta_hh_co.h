@@ -77,7 +77,7 @@ extern void bta_hh_co_open(uint8_t dev_handle, uint8_t sub_class,
  ******************************************************************************/
 extern void bta_hh_co_close(uint8_t dev_handle, uint8_t app_id);
 
-#if (BTA_HH_LE_INCLUDED == TRUE)
+#if (BLE_INCLUDED == TRUE && BTA_HH_LE_INCLUDED == TRUE)
 /*******************************************************************************
  *
  * Function         bta_hh_le_co_rpt_info
@@ -131,6 +131,6 @@ extern tBTA_HH_RPT_CACHE_ENTRY* bta_hh_le_co_cache_load(
 extern void bta_hh_le_co_reset_rpt_cache(const RawAddress& remote_bda,
                                          uint8_t app_id);
 
-#endif /* #if (BTA_HH_LE_INCLUDED == TRUE) */
+#endif /* #if (BLE_INCLUDED == true && BTA_HH_LE_INCLUDED == TRUE) */
 
 #endif /* BTA_HH_CO_H */

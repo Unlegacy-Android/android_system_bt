@@ -38,6 +38,7 @@
 #include "stack_config.h"
 
 using base::StringPrintf;
+#if (BLE_INCLUDED == TRUE)
 
 static void l2cble_start_conn_update(tL2C_LCB* p_lcb);
 
@@ -1431,3 +1432,4 @@ bool l2ble_sec_access_req(const RawAddress& bd_addr, uint16_t psm,
 
   return status;
 }
+#endif /* (BLE_INCLUDED == TRUE) */

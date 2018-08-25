@@ -434,6 +434,7 @@ typedef struct t_l2c_linkcb {
 #endif
 
   tBT_TRANSPORT transport;
+#if (BLE_INCLUDED == TRUE)
   uint8_t initiating_phys;  // LE PHY used for connection initiation
   tBLE_ADDR_TYPE ble_addr_type;
   uint16_t tx_data_len; /* tx data length used in data length extension */
@@ -454,6 +455,7 @@ typedef struct t_l2c_linkcb {
   uint16_t max_interval;
   uint16_t latency;
   uint16_t timeout;
+#endif
 
 #if (L2CAP_ROUND_ROBIN_CHANNEL_SERVICE == TRUE)
   /* each priority group is limited burst transmission */
@@ -511,6 +513,7 @@ typedef struct {
       fixed_reg[L2CAP_NUM_FIXED_CHNLS]; /* Reg info for fixed channels */
 #endif
 
+#if (BLE_INCLUDED == TRUE)
   uint16_t num_ble_links_active; /* Number of LE links active */
   bool is_ble_connecting;
   RawAddress ble_connecting_bda;
@@ -521,6 +524,7 @@ typedef struct {
   uint16_t ble_round_robin_unacked; /* Round-robin unacked */
   bool ble_check_round_robin;       /* Do a round robin check */
   tL2C_RCB ble_rcb_pool[BLE_MAX_L2CAP_CLIENTS]; /* Registration info pool */
+#endif
 
   tL2CA_ECHO_DATA_CB* p_echo_data_cb; /* Echo data callback */
 
@@ -647,6 +651,7 @@ extern void l2cu_tx_complete(tL2C_TX_COMPLETE_CB_INFO* p_cbi);
 extern void l2cu_set_non_flushable_pbf(bool);
 #endif
 
+#if (BLE_INCLUDED == TRUE)
 extern void l2cu_send_peer_ble_par_req(tL2C_LCB* p_lcb, uint16_t min_int,
                                        uint16_t max_int, uint16_t latency,
                                        uint16_t timeout);
@@ -660,6 +665,7 @@ extern void l2cu_send_peer_ble_credit_based_conn_req(tL2C_CCB* p_ccb);
 extern void l2cu_send_peer_ble_flow_control_credit(tL2C_CCB* p_ccb,
                                                    uint16_t credit_value);
 extern void l2cu_send_peer_ble_credit_based_disconn_req(tL2C_CCB* p_ccb);
+#endif
 
 extern bool l2cu_initialize_fixed_ccb(tL2C_LCB* p_lcb, uint16_t fixed_cid,
                                       tL2CAP_FCR_OPTS* p_fcr);
@@ -747,7 +753,9 @@ extern void l2c_link_segments_xmitted(BT_HDR* p_msg);
 extern void l2c_pin_code_request(const RawAddress& bd_addr);
 extern void l2c_link_adjust_chnl_allocation(void);
 
+#if (BLE_INCLUDED == TRUE)
 extern void l2c_link_processs_ble_num_bufs(uint16_t num_lm_acl_bufs);
+#endif
 
 #if (L2CAP_WAKE_PARKED_LINK == TRUE)
 extern bool l2c_link_check_power_mode(tL2C_LCB* p_lcb);
@@ -802,6 +810,7 @@ extern void l2c_fcr_stop_timer(tL2C_CCB* p_ccb);
 /* Functions provided by l2c_ble.cc
  ***********************************
 */
+#if (BLE_INCLUDED == TRUE)
 extern bool l2cble_create_conn(tL2C_LCB* p_lcb);
 extern void l2cble_process_sig_cmd(tL2C_LCB* p_lcb, uint8_t* p,
                                    uint16_t pkt_len);
@@ -841,6 +850,7 @@ extern void l2cble_process_data_length_change_event(uint16_t handle,
                                                     uint16_t tx_data_len,
                                                     uint16_t rx_data_len);
 
+#endif
 extern void l2cu_process_fixed_disc_cback(tL2C_LCB* p_lcb);
 
 #endif
