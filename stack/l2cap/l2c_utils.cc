@@ -248,6 +248,7 @@ void l2cu_release_lcb(tL2C_LCB* p_lcb) {
     (*p_cb)(L2CAP_PING_RESULT_NO_LINK);
   }
 
+#if (BLE_INCLUDED == TRUE)
   /* Check and release all the LE COC connections waiting for security */
   if (p_lcb->le_sec_pending_q) {
     while (!fixed_queue_is_empty(p_lcb->le_sec_pending_q)) {
@@ -261,6 +262,7 @@ void l2cu_release_lcb(tL2C_LCB* p_lcb) {
     fixed_queue_free(p_lcb->le_sec_pending_q, NULL);
     p_lcb->le_sec_pending_q = NULL;
   }
+#endif
 }
 
 /*******************************************************************************
@@ -1146,7 +1148,7 @@ void l2cu_send_peer_info_rsp(tL2C_LCB* p_lcb, uint8_t remote_id,
 #endif
   {
     UINT16_TO_STREAM(p, L2CAP_INFO_RESP_RESULT_SUCCESS);
-l2cu_send_peer_info_rsp 
+#if (BLE_INCLUDED == TRUE)
     if (p_lcb->transport == BT_TRANSPORT_LE) {
       /* optional data are not added for now */
       UINT32_TO_STREAM(p, L2CAP_BLE_EXTFEA_MASK);
@@ -1731,6 +1733,7 @@ tL2C_RCB* l2cu_allocate_rcb(uint16_t psm) {
   return (NULL);
 }
 
+#if (BLE_INCLUDED == TRUE)
 /*******************************************************************************
  *
  * Function         l2cu_allocate_ble_rcb
@@ -1759,6 +1762,7 @@ tL2C_RCB* l2cu_allocate_ble_rcb(uint16_t psm) {
   /* If here, no free RCB found */
   return (NULL);
 }
+#endif
 
 /*******************************************************************************
  *
@@ -1803,6 +1807,7 @@ void l2cu_disconnect_chnl(tL2C_CCB* p_ccb) {
   }
 }
 
+#if (BLE_INCLUDED == TRUE)
 /*******************************************************************************
  *
  * Function         l2cu_find_rcb_by_psm
@@ -1846,6 +1851,7 @@ tL2C_RCB* l2cu_find_ble_rcb_by_psm(uint16_t psm) {
   /* If here, no match found */
   return (NULL);
 }
+#endif
 
 /*******************************************************************************
  *
