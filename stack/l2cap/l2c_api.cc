@@ -321,6 +321,7 @@ uint16_t L2CA_ErtmConnectReq(uint16_t psm, const RawAddress& p_bd_addr,
   return (p_ccb->local_cid);
 }
 
+#if (BLE_INCLUDED == TRUE)
 /*******************************************************************************
  *
  * Function         L2CA_RegisterLECoc
@@ -512,6 +513,7 @@ uint16_t L2CA_ConnectLECocReq(uint16_t psm, const RawAddress& p_bd_addr,
   /* Return the local CID as our handle */
   return p_ccb->local_cid;
 }
+#endif
 
 /*******************************************************************************
  *
