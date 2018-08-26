@@ -90,17 +90,17 @@ typedef uint8_t tBTA_STATUS;
 #define BTA_HDP_SERVICE_ID 27        /* Health Device Profile */
 #define BTA_PCE_SERVICE_ID 28        /* PhoneBook Access Client */
 #define BTA_SDP_SERVICE_ID 29        /* SDP Search */
-#if (BLE_INCLUDED == TRUE && BTA_GATT_INCLUDED == TRUE)
 #define BTA_HIDD_SERVICE_ID 30       /* HID Device */
 
+#if (BLE_INCLUDED == TRUE && BTA_GATT_INCLUDED == TRUE)
 /* BLE profile service ID */
 #define BTA_BLE_SERVICE_ID 31  /* GATT profile */
 #define BTA_USER_SERVICE_ID 32 /* User requested UUID */
 #define BTA_MAX_SERVICE_ID 33
 
 #else
-#define BTA_USER_SERVICE_ID 30 /* User requested UUID */
-#define BTA_MAX_SERVICE_ID 31
+#define BTA_USER_SERVICE_ID 31 /* User requested UUID */
+#define BTA_MAX_SERVICE_ID 32
 #endif
 /* service IDs (BTM_SEC_SERVICE_FIRST_EMPTY + 1) to (BTM_SEC_MAX_SERVICES - 1)
  * are used by BTA JV */
