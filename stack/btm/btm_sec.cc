@@ -6073,7 +6073,9 @@ bool btm_sec_is_a_bonded_dev(const RawAddress& bda) {
  *
  ******************************************************************************/
 bool btm_sec_is_le_capable_dev(const RawAddress& bda) {
+#if (BLE_INCLUDED == TRUE)
   tBTM_SEC_DEV_REC* p_dev_rec = btm_find_dev(bda);
+#endif
   bool le_capable = false;
 
 #if (BLE_INCLUDED == TRUE)

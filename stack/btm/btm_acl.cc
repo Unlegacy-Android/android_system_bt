@@ -180,11 +180,12 @@ bool btm_ble_get_acl_remote_addr(tBTM_SEC_DEV_REC* p_dev_rec,
 }
 #else
 bool    btm_ble_get_acl_remote_addr(UNUSED_ATTR tBTM_SEC_DEV_REC *p_dev_rec,
-                                    UNUSED_ATTR BD_ADDR conn_addr,
+                                    UNUSED_ATTR RawAddress& conn_addr,
                                     UNUSED_ATTR tBLE_ADDR_TYPE *p_addr_type)
 {
     return false;
 }
+#endif
 #endif
 /*******************************************************************************
  *
@@ -312,12 +313,14 @@ void btm_acl_created(const RawAddress& bda, DEV_CLASS dc, BD_NAME bdn,
   }
 }
 
+#if (BLE_INCLUDED == TRUE)
 void btm_acl_update_conn_addr(uint16_t conn_handle, const RawAddress& address) {
   uint8_t idx = btm_handle_to_acl_index(conn_handle);
   if (idx != MAX_L2CAP_LINKS) {
     btm_cb.acl_db[idx].conn_addr = address;
   }
 }
+#endif
 
 /*******************************************************************************
  *
@@ -844,6 +847,7 @@ void BTM_SetDefaultLinkPolicy(uint16_t settings) {
   btsnd_hcic_write_def_policy_set(settings);
 }
 
+#if (BLE_INCLUDED == TRUE)
 void btm_use_preferred_conn_params(const RawAddress& bda) {
   tL2C_LCB* p_lcb = l2cu_find_lcb_by_bd_addr(bda, BT_TRANSPORT_LE);
   tBTM_SEC_DEV_REC* p_dev_rec = btm_find_or_alloc_dev(bda);
@@ -881,6 +885,7 @@ void btm_use_preferred_conn_params(const RawAddress& bda) {
         p_dev_rec->conn_params.supervision_tout, 0, 0);
   }
 }
+#endif
 
 /*******************************************************************************
  *
@@ -1977,14 +1982,18 @@ tBTM_STATUS BTM_ReadFailedContactCounter(const RawAddress& remote_bda,
                                          tBTM_CMPL_CB* p_cb) {
   tACL_CONN* p;
   tBT_TRANSPORT transport = BT_TRANSPORT_BR_EDR;
+#if (BLE_INCLUDED == TRUE)
   tBT_DEVICE_TYPE dev_type;
   tBLE_ADDR_TYPE addr_type;
+#endif
 
   /* If someone already waiting on the result, do not allow another */
   if (btm_cb.devcb.p_failed_contact_counter_cmpl_cb) return (BTM_BUSY);
 
+#if (BLE_INCLUDED == TRUE)
   BTM_ReadDevInfo(remote_bda, &dev_type, &addr_type);
   if (dev_type == BT_DEVICE_TYPE_BLE) transport = BT_TRANSPORT_LE;
+#endif
 
   p = btm_bda_to_acl(remote_bda, transport);
   if (p != (tACL_CONN*)NULL) {
@@ -2016,14 +2025,18 @@ tBTM_STATUS BTM_ReadAutomaticFlushTimeout(const RawAddress& remote_bda,
                                           tBTM_CMPL_CB* p_cb) {
   tACL_CONN* p;
   tBT_TRANSPORT transport = BT_TRANSPORT_BR_EDR;
+#if (BLE_INCLUDED == TRUE)
   tBT_DEVICE_TYPE dev_type;
   tBLE_ADDR_TYPE addr_type;
+#endif
 
   /* If someone already waiting on the result, do not allow another */
   if (btm_cb.devcb.p_automatic_flush_timeout_cmpl_cb) return (BTM_BUSY);
 
+#if (BLE_INCLUDED == TRUE)
   BTM_ReadDevInfo(remote_bda, &dev_type, &addr_type);
   if (dev_type == BT_DEVICE_TYPE_BLE) transport = BT_TRANSPORT_LE;
+#endif
 
   p = btm_bda_to_acl(remote_bda, transport);
   if (!p) return BTM_UNKNOWN_ADDR;

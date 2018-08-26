@@ -166,9 +166,11 @@ extern void btif_gatts_add_bonded_dev_from_nv(const RawAddress& bda);
  *  Internal Functions
  ******************************************************************************/
 
+#if (BLE_INCLUDED == TRUE)
 static bt_status_t btif_in_fetch_bonded_ble_device(
     const char* remote_bd_addr, int add,
     btif_bonded_devices_t* p_bonded_devices);
+#endif
 static bt_status_t btif_in_fetch_bonded_device(const char* bdstr);
 
 static bool btif_has_ble_keys(const char* bdstr);
@@ -435,7 +437,9 @@ static bt_status_t btif_in_fetch_bonded_devices(
   memset(p_bonded_devices, 0, sizeof(btif_bonded_devices_t));
 
   bool bt_linkkey_file_found = false;
+#if (BLE_INCLUDED == TRUE)
   int device_type;
+#endif
 
   for (const btif_config_section_iter_t* iter = btif_config_section_begin();
        iter != btif_config_section_end();
@@ -492,6 +496,7 @@ static bt_status_t btif_in_fetch_bonded_devices(
   return BT_STATUS_SUCCESS;
 }
 
+#if (BLE_INCLUDED == TRUE)
 static void btif_read_le_key(const uint8_t key_type, const size_t key_len,
                              RawAddress bd_addr, const uint8_t addr_type,
                              const bool add_key, bool* device_added,
@@ -518,6 +523,7 @@ static void btif_read_le_key(const uint8_t key_type, const size_t key_len,
     *key_found = true;
   }
 }
+#endif
 
 /*******************************************************************************
  * Functions

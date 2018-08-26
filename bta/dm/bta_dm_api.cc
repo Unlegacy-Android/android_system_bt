@@ -882,6 +882,8 @@ void BTA_DmDiscoverByTransport(const RawAddress& bd_addr,
                                tBTA_TRANSPORT transport) {
 #if (BLE_INCLUDED == TRUE && BTA_GATT_INCLUDED == TRUE)
   bta_dm_discover_send_msg(bd_addr, p_services, p_cback, sdp_search, transport);
+#else
+  return;
 #endif
 }
 
@@ -1239,6 +1241,7 @@ void BTA_VendorCleanup(void) {
   }
 
   if (cmn_ble_vsc_cb.tot_scan_results_strg > 0) btm_ble_batchscan_cleanup();
+#endif
 
   if (cmn_ble_vsc_cb.adv_inst_max > 0) btm_ble_multi_adv_cleanup();
 }
