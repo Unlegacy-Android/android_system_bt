@@ -228,6 +228,7 @@ bt_status_t btif_storage_get_remote_addr_type(const RawAddress* remote_bd_addr,
 
 bt_status_t btif_storage_set_remote_addr_type(const RawAddress* remote_bd_addr,
                                               uint8_t addr_type);
+#endif
 
 /*******************************************************************************
  * Function         btif_storage_load_hidd
@@ -269,7 +270,6 @@ bt_status_t btif_storage_remove_hidd(RawAddress* remote_bd_addr);
 // Note: |name| should point to a buffer that can store string of length
 // |BTM_MAX_REM_BD_NAME_LEN|.
 bool btif_storage_get_stored_remote_name(const RawAddress& bd_addr, char* name);
-#endif
 
 /******************************************************************************
  * Exported for unit tests

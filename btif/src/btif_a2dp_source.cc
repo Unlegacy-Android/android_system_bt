@@ -44,6 +44,7 @@
 #include "osi/include/osi.h"
 #include "osi/include/thread.h"
 #include "osi/include/time.h"
+#include "osi/include/alarm.h"
 #include "uipc.h"
 
 using system_bt_osi::BluetoothMetricsLogger;
