@@ -16,7 +16,6 @@
  *
  ******************************************************************************/
 
-#if (BLE_INCLUDED == TRUE)
 #include <base/logging.h>
 #include <base/strings/stringprintf.h>
 #include <string.h>
@@ -26,6 +25,7 @@
 #include "gap_api.h"
 #include "gatt_api.h"
 
+#if (BLE_INCLUDED == TRUE)
 using base::StringPrintf;
 
 namespace {

@@ -32,6 +32,7 @@
 #include "osi/include/log.h"
 #include "osi/include/osi.h"
 #include "osi/include/thread.h"
+#include "osi/include/alarm.h"
 
 #include "oi_codec_sbc.h"
 #include "oi_status.h"

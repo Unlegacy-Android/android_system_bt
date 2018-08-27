@@ -135,8 +135,6 @@ static tBTTRC_FUNC_MAP bttrc_set_level_map[] = {
      DEFAULT_CONF_TRACE_LEVEL},
 #endif
 #if (BLE_INCLUDED == TRUE)
-    {BTTRC_ID_STK_GATT, BTTRC_ID_STK_GATT, GATT_SetTraceLevel, "TRC_GATT",
-     DEFAULT_CONF_TRACE_LEVEL},
     {BTTRC_ID_STK_SMP, BTTRC_ID_STK_SMP, SMP_SetTraceLevel, "TRC_SMP",
      DEFAULT_CONF_TRACE_LEVEL},
 #endif

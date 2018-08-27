@@ -1786,7 +1786,7 @@ void btm_process_inq_results(uint8_t* p, uint8_t inq_res_mode) {
            p_i->inq_info.results.rssi == 0
 #if (BLE_INCLUDED == TRUE)
            /* BR/EDR inquiry information update */
-           || (p_i->inq_info.results.device_type & BT_DEVICE_TYPE_BREDR) != 0)
+           || ((p_i->inq_info.results.device_type & BT_DEVICE_TYPE_BREDR) != 0)
 #endif
 	  )) {
         p_cur = &p_i->inq_info.results;

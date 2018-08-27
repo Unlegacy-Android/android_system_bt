@@ -30,10 +30,10 @@
 #include "osi/include/future.h"
 #include "stack/include/btm_ble_api.h"
 
+#if (BLE_INCLUDED)
 const bt_event_mask_t BLE_EVENT_MASK = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x1E, 0x7f}};
 
-#if (BLE_INCLUDED)
 const bt_event_mask_t CLASSIC_EVENT_MASK = {HCI_DUMO_EVENT_MASK_EXT};
 #else
 const bt_event_mask_t CLASSIC_EVENT_MASK = {HCI_LISBON_EVENT_MASK_EXT};

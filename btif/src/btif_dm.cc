@@ -47,6 +47,7 @@
 #include "bt_common.h"
 #include "bta_closure_api.h"
 #include "bta_gatt_api.h"
+#include "bta_api.h"
 #include "btif_api.h"
 #include "btif_config.h"
 #include "btif_dm.h"
@@ -230,10 +231,10 @@ static void btif_dm_ble_passkey_req_evt(tBTA_DM_PIN_REQ* p_pin_req);
 static void btif_dm_ble_key_nc_req_evt(tBTA_DM_SP_KEY_NOTIF* p_notif_req);
 static void btif_dm_ble_oob_req_evt(tBTA_DM_SP_RMT_OOB* req_oob_type);
 static void btif_dm_ble_sc_oob_req_evt(tBTA_DM_SP_RMT_OOB* req_oob_type);
-#endif
 
 static void bte_scan_filt_param_cfg_evt(uint8_t action_type, uint8_t avbl_space,
                                         uint8_t ref_value, uint8_t status);
+#endif
 
 static char* btif_get_default_local_name();
 
@@ -1073,8 +1074,11 @@ static void btif_dm_auth_cmpl_evt(tBTA_DM_AUTH_CMPL* p_auth_cmpl) {
   // derivation to allow bond state change notification for the BR/EDR transport
   // so that the subsequent BR/EDR connections to the remote can use the derived
   // link key.
-  if (p_auth_cmpl->bd_addr != pairing_cb.bd_addr &&
-      (!pairing_cb.ble.is_penc_key_rcvd)) {
+  if (p_auth_cmpl->bd_addr != pairing_cb.bd_addr
+#if (BLE_INCLUDED == TRUE)
+      && (!pairing_cb.ble.is_penc_key_rcvd)
+#endif
+  ) {
     LOG(INFO) << __func__
               << " skipping SDP since we did not initiate pairing to "
               << p_auth_cmpl->bd_addr;
@@ -1276,7 +1280,9 @@ static void btif_dm_search_devices_evt(uint16_t event, char* p_param) {
         bt_device_type_t dev_type;
         uint32_t num_properties = 0;
         bt_status_t status;
+#if (BLE_INCLUDED == TRUE)
         int addr_type = 0;
+#endif
 
         memset(properties, 0, sizeof(properties));
         /* RawAddress */
@@ -1321,7 +1327,7 @@ static void btif_dm_search_devices_evt(uint16_t event, char* p_param) {
         if (p_search_data->inq_res.device_type == BT_DEVICE_TYPE_BLE)
           addr_type = p_search_data->inq_res.ble_addr_type;
 #else
-        dev_type = BT_DEVICE_TYPE_BREDR;
+        dev_type = (bt_device_type_t)BT_DEVICE_TYPE_BREDR;
 #endif
         BTIF_STORAGE_FILL_PROPERTY(&properties[num_properties],
                                    BT_PROPERTY_TYPE_OF_DEVICE, sizeof(dev_type),
@@ -2137,7 +2143,6 @@ static void bta_energy_info_cb(tBTA_DM_BLE_TX_TIME_MS tx_time,
                         (char*)&btif_cb, sizeof(btif_activity_energy_info_cb_t),
                         NULL);
 }
-#endif
 
 /* Scan filter param config event */
 static void bte_scan_filt_param_cfg_evt(uint8_t ref_value, uint8_t avbl_space,
@@ -2151,6 +2156,7 @@ static void bte_scan_filt_param_cfg_evt(uint8_t ref_value, uint8_t avbl_space,
     BTIF_TRACE_DEBUG("%s", __func__);
   }
 }
+#endif
 
 /*****************************************************************************
  *
@@ -2281,6 +2287,7 @@ bt_status_t btif_dm_create_bond_out_of_band(
   oob_cb.bdaddr = *bd_addr;
   memcpy(&oob_cb.oob_data, oob_data, sizeof(bt_out_of_band_data_t));
 
+#if (BLE_INCLUDED == TRUE)
   uint8_t empty[] = {0, 0, 0, 0, 0, 0, 0};
   // If LE Bluetooth Device Address is provided, use provided address type
   // value.
@@ -2293,6 +2300,7 @@ bt_status_t btif_dm_create_bond_out_of_band(
       BTM_SecAddBleDevice(*bd_addr, NULL, BT_DEVICE_TYPE_BLE, address_type);
     }
   }
+#endif
 
   BTIF_TRACE_EVENT("%s: bd_addr=%s, transport=%d", __func__,
                    bd_addr->ToString().c_str(), transport);
@@ -2342,13 +2350,13 @@ bt_status_t btif_dm_cancel_bond(const RawAddress* bd_addr) {
 
 #else
     if (pairing_cb.is_ssp) {
-      BTA_DmConfirm((uint8_t*)bd_addr->address, false);
+      BTA_DmConfirm(*bd_addr, false);
     } else {
-      BTA_DmPinReply((uint8_t*)bd_addr->address, false, 0, NULL);
+      BTA_DmPinReply(*bd_addr, false, 0, NULL);
     }
     /* Cancel bonding, in case it is in ACL connection setup state */
-    BTA_DmBondCancel((uint8_t*)bd_addr->address);
-    btif_storage_remove_bonded_device((bt_bdaddr_t*)bd_addr);
+    BTA_DmBondCancel(*bd_addr);
+    btif_storage_remove_bonded_device(bd_addr);
 #endif
   }
 
@@ -2421,15 +2429,13 @@ bt_status_t btif_dm_pin_reply(const RawAddress* bd_addr, uint8_t accept,
     BTIF_TRACE_DEBUG("btif_dm_pin_reply: passkey: %d", passkey);
     BTA_DmBlePasskeyReply(*bd_addr, accept, passkey);
 
-  } else {
+  } else
+#endif
+  {
     BTA_DmPinReply(*bd_addr, accept, pin_len, pin_code->pin);
     if (accept) pairing_cb.pin_code_len = pin_len;
   }
-#else
-  BTA_DmPinReply((uint8_t*)bd_addr->address, accept, pin_len, pin_code->pin);
 
-  if (accept) pairing_cb.pin_code_len = pin_len;
-#endif
   return BT_STATUS_SUCCESS;
 }
 
@@ -2465,12 +2471,12 @@ bt_status_t btif_dm_ssp_reply(const RawAddress* bd_addr,
       else
         BTA_DmBleSecurityGrant(*bd_addr, BTA_DM_SEC_PAIR_NOT_SPT);
     }
-  } else {
+  } else
+#endif
+  {
     BTA_DmConfirm(*bd_addr, accept);
   }
-#else
-  BTA_DmConfirm((uint8_t*)bd_addr->address, accept);
-#endif
+
   return BT_STATUS_SUCCESS;
 }
 
@@ -2552,8 +2558,10 @@ bt_status_t btif_dm_get_remote_services_by_transport(RawAddress* remote_addr,
   mask_ext.p_uuid = NULL;
   mask_ext.srvc_mask = BTA_ALL_SERVICE_MASK;
 
+#if (BLE_INCLUDED == TRUE)
   BTA_DmDiscoverByTransport(*remote_addr, &mask_ext, bte_dm_search_services_evt,
                             true, transport);
+#endif
 
   return BT_STATUS_SUCCESS;
 }
@@ -2766,12 +2774,15 @@ bool btif_dm_get_smp_config(tBTE_APPL_CFG* p_cfg) {
 
   char conf[64];
   const char* recv = stack_config_get_interface()->get_pts_smp_options();
+#if (BLE_INCLUDED == TRUE)
   char* pch;
   char* endptr;
+#endif
 
   strncpy(conf, recv, 64);
   conf[63] = 0;  // null terminate
 
+#if (BLE_INCLUDED == TRUE)
   pch = strtok(conf, ",");
   if (pch != NULL)
     p_cfg->ble_auth_req = (uint8_t)strtoul(pch, &endptr, 16);
@@ -2801,6 +2812,7 @@ bool btif_dm_get_smp_config(tBTE_APPL_CFG* p_cfg) {
     p_cfg->ble_max_key_size = (uint8_t)strtoul(pch, &endptr, 16);
   else
     return false;
+#endif
 
   return true;
 }
