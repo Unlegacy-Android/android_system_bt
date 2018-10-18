@@ -30,6 +30,7 @@
 #include "osi/include/reactor.h"
 #include "osi/include/thread.h"
 #include "vendor.h"
+#include "bt_target.h"
 
 #define HCI_HAL_SERIAL_BUFFER_SIZE 1026
 #define HCI_BLE_EVENT 0x3e
