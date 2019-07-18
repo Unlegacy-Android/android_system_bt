@@ -542,10 +542,15 @@ void bta_dm_set_dev_name (tBTA_DM_MSG *p_data)
 void bta_dm_set_visibility(tBTA_DM_MSG *p_data)
 {
     UINT16 window, interval;
-    UINT16 le_disc_mode = BTM_BleReadDiscoverability();
     UINT16 disc_mode = BTM_ReadDiscoverability(&window, &interval);
-    UINT16 le_conn_mode = BTM_BleReadConnectability();
     UINT16 conn_mode = BTM_ReadConnectability(&window, &interval);
+#if BLE_INCLUDED == TRUE
+    UINT16 le_disc_mode = BTM_BleReadDiscoverability();
+    UINT16 le_conn_mode = BTM_BleReadConnectability();
+#else
+    UINT16 le_disc_mode = BTA_DM_LE_IGNORE;
+    UINT16 le_conn_mode = BTA_DM_LE_IGNORE;
+#endif
 
     /* set modes for Discoverability and connectability if not ignore */
     if (p_data->set_visibility.disc_mode != (BTA_DM_IGNORE | BTA_DM_LE_IGNORE))
@@ -669,15 +674,19 @@ void bta_dm_remove_device(tBTA_DM_MSG *p_data)
             if (!bdcmp(bta_dm_cb.device_list.peer_device[i].peer_bdaddr, p_dev->bd_addr))
             {
                 bta_dm_cb.device_list.peer_device[i].conn_state = BTA_DM_UNPAIRING;
+#if (BLE_INCLUDED == TRUE)
                 btm_remove_acl( p_dev->bd_addr, bta_dm_cb.device_list.peer_device[i].transport);
                 APPL_TRACE_DEBUG("%s:transport = %d", __func__,
                                   bta_dm_cb.device_list.peer_device[i].transport);
 
                 /* save the other transport to check if device is connected on other_transport */
                 if(bta_dm_cb.device_list.peer_device[i].transport == BT_TRANSPORT_LE)
+#endif
                    other_transport = BT_TRANSPORT_BR_EDR;
+#if (BLE_INCLUDED == TRUE)
                 else
                    other_transport = BT_TRANSPORT_LE;
+#endif
                 break;
             }
         }
@@ -690,6 +699,7 @@ void bta_dm_remove_device(tBTA_DM_MSG *p_data)
     // If it is DUMO device and device is paired as different address, unpair that device
     // if different address
     BOOLEAN continue_delete_other_dev = FALSE;
+#if (BLE_INCLUDED == TRUE)
     if ((other_transport && (BTM_ReadConnectedTransportAddress(other_address, other_transport))) ||
       (!other_transport && (BTM_ReadConnectedTransportAddress(other_address, BT_TRANSPORT_BR_EDR) ||
        BTM_ReadConnectedTransportAddress(other_address, BT_TRANSPORT_LE))))
@@ -711,6 +721,7 @@ void bta_dm_remove_device(tBTA_DM_MSG *p_data)
         APPL_TRACE_DEBUG("%s: continue to delete the other dev ", __func__);
         continue_delete_other_dev = TRUE;
     }
+#endif
 
     /* Delete the device mentioned in the msg */
     if (continue_delete_dev)
@@ -2326,7 +2337,9 @@ static void bta_dm_discover_device(BD_ADDR remote_bd_addr)
     }
 
     if((bta_dm_search_cb.p_btm_inq_info)
+#if (BLE_INCLUDED == TRUE)
        && (bta_dm_search_cb.p_btm_inq_info->results.device_type == BT_DEVICE_TYPE_BLE)
+#endif
        && (bta_dm_search_cb.state == BTA_DM_SEARCH_ACTIVE))
     {
         /* Do not perform RNR for LE devices at inquiry complete*/
